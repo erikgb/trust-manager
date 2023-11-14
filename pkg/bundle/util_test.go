@@ -17,6 +17,7 @@ limitations under the License.
 package bundle
 
 import (
+	trustapiac "github.com/cert-manager/trust-manager/pkg/applyconfigurations/trust/v1alpha1"
 	"testing"
 	"time"
 
@@ -36,32 +37,32 @@ func Test_bundleHasCondition(t *testing.T) {
 
 	tests := map[string]struct {
 		existingConditions []trustapi.BundleCondition
-		newCondition       trustapi.BundleCondition
+		newCondition       *trustapiac.BundleConditionApplyConfiguration
 		expectHasCondition bool
 	}{
 		"no existing conditions returns no matching condition": {
 			existingConditions: []trustapi.BundleCondition{},
-			newCondition:       trustapi.BundleCondition{Reason: "A", ObservedGeneration: bundleGeneration},
+			newCondition:       trustapiac.BundleCondition().WithReason("A").WithObservedGeneration(bundleGeneration),
 			expectHasCondition: false,
 		},
 		"an existing condition which doesn't match the current condition should return false": {
 			existingConditions: []trustapi.BundleCondition{{Reason: "B"}},
-			newCondition:       trustapi.BundleCondition{Reason: "A", ObservedGeneration: bundleGeneration},
+			newCondition:       trustapiac.BundleCondition().WithReason("A").WithObservedGeneration(bundleGeneration),
 			expectHasCondition: false,
 		},
 		"an existing condition which shares the same condition but is an older generation should return false": {
 			existingConditions: []trustapi.BundleCondition{{Reason: "A", ObservedGeneration: bundleGeneration - 1}},
-			newCondition:       trustapi.BundleCondition{Reason: "A", ObservedGeneration: bundleGeneration},
+			newCondition:       trustapiac.BundleCondition().WithReason("A").WithObservedGeneration(bundleGeneration),
 			expectHasCondition: false,
 		},
 		"an existing condition which shares the same condition and generation should return true": {
 			existingConditions: []trustapi.BundleCondition{{Reason: "A", ObservedGeneration: bundleGeneration}},
-			newCondition:       trustapi.BundleCondition{Reason: "A", ObservedGeneration: bundleGeneration},
+			newCondition:       trustapiac.BundleCondition().WithReason("A").WithObservedGeneration(bundleGeneration),
 			expectHasCondition: true,
 		},
 		"an existing condition with a different LastTransitionTime should return true still": {
 			existingConditions: []trustapi.BundleCondition{{Reason: "A", ObservedGeneration: bundleGeneration, LastTransitionTime: &metav1.Time{Time: fixedTime.Add(-time.Second)}}},
-			newCondition:       trustapi.BundleCondition{Reason: "A", ObservedGeneration: bundleGeneration},
+			newCondition:       trustapiac.BundleCondition().WithReason("A").WithObservedGeneration(bundleGeneration),
 			expectHasCondition: true,
 		},
 	}
