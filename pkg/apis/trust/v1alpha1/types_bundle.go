@@ -94,9 +94,7 @@ type BundleSource struct {
 	UseDefaultCAs *bool `json:"useDefaultCAs,omitempty"`
 }
 
-// BundleTarget is the target resource that the Bundle will sync all source
-// data to.
-type BundleTarget struct {
+type BundleTargetSpec struct {
 	// ConfigMap is the target ConfigMap in Namespaces that all Bundle source
 	// data will be synced to.
 	ConfigMap *KeySelector `json:"configMap,omitempty"`
@@ -109,6 +107,12 @@ type BundleTarget struct {
 	// AdditionalFormats specifies any additional formats to write to the target
 	// +optional
 	AdditionalFormats *AdditionalFormats `json:"additionalFormats,omitempty"`
+}
+
+// BundleTarget is the target resource that the Bundle will sync all source
+// data to.
+type BundleTarget struct {
+	BundleTargetSpec `json:",inline"`
 
 	// NamespaceSelector will, if set, only sync the target resource in
 	// Namespaces which match the selector.

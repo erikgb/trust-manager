@@ -213,7 +213,7 @@ func Test_buildSourceBundle(t *testing.T) {
 				Sources: []trustapi.BundleSource{
 					{ConfigMap: &trustapi.SourceObjectKeySelector{Name: "configmap", KeySelector: trustapi.KeySelector{Key: "key"}}},
 				},
-				Target: trustapi.BundleTarget{
+				Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{
 					AdditionalFormats: &trustapi.AdditionalFormats{
 						JKS: &trustapi.JKS{
 							KeySelector: trustapi.KeySelector{
@@ -221,7 +221,8 @@ func Test_buildSourceBundle(t *testing.T) {
 							},
 							Password: ptr.To(DefaultJKSPassword),
 						},
-					}},
+					},
+				}},
 			}},
 			objects: []runtime.Object{&corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{Name: "configmap"},
@@ -235,7 +236,7 @@ func Test_buildSourceBundle(t *testing.T) {
 				Sources: []trustapi.BundleSource{
 					{ConfigMap: &trustapi.SourceObjectKeySelector{Name: "configmap", KeySelector: trustapi.KeySelector{Key: "key"}}},
 				},
-				Target: trustapi.BundleTarget{
+				Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{
 					AdditionalFormats: &trustapi.AdditionalFormats{
 						JKS: &trustapi.JKS{
 							KeySelector: trustapi.KeySelector{
@@ -243,7 +244,8 @@ func Test_buildSourceBundle(t *testing.T) {
 							},
 							Password: ptr.To("testPasswd123"),
 						},
-					}},
+					},
+				}},
 			}},
 			objects: []runtime.Object{&corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{Name: "configmap"},
@@ -258,7 +260,7 @@ func Test_buildSourceBundle(t *testing.T) {
 				Sources: []trustapi.BundleSource{
 					{ConfigMap: &trustapi.SourceObjectKeySelector{Name: "configmap", KeySelector: trustapi.KeySelector{Key: "key"}}},
 				},
-				Target: trustapi.BundleTarget{
+				Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{
 					AdditionalFormats: &trustapi.AdditionalFormats{
 						PKCS12: &trustapi.PKCS12{
 							KeySelector: trustapi.KeySelector{
@@ -267,7 +269,7 @@ func Test_buildSourceBundle(t *testing.T) {
 							Password: ptr.To(DefaultPKCS12Password),
 						},
 					},
-				},
+				}},
 			}},
 
 			objects: []runtime.Object{&corev1.ConfigMap{
@@ -282,7 +284,7 @@ func Test_buildSourceBundle(t *testing.T) {
 				Sources: []trustapi.BundleSource{
 					{ConfigMap: &trustapi.SourceObjectKeySelector{Name: "configmap", KeySelector: trustapi.KeySelector{Key: "key"}}},
 				},
-				Target: trustapi.BundleTarget{
+				Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{
 					AdditionalFormats: &trustapi.AdditionalFormats{
 						PKCS12: &trustapi.PKCS12{
 							KeySelector: trustapi.KeySelector{
@@ -291,7 +293,7 @@ func Test_buildSourceBundle(t *testing.T) {
 							Password: ptr.To("testPasswd123"),
 						},
 					},
-				},
+				}},
 			}},
 
 			objects: []runtime.Object{&corev1.ConfigMap{

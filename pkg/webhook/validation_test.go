@@ -64,7 +64,7 @@ func Test_validate(t *testing.T) {
 							Secret:    &trustapi.SourceObjectKeySelector{Name: "test", KeySelector: trustapi.KeySelector{Key: "test"}},
 						},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -78,7 +78,7 @@ func Test_validate(t *testing.T) {
 					Sources: []trustapi.BundleSource{
 						{},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -94,7 +94,7 @@ func Test_validate(t *testing.T) {
 							UseDefaultCAs: ptr.To(false),
 						},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -112,7 +112,7 @@ func Test_validate(t *testing.T) {
 							UseDefaultCAs: ptr.To(true),
 						},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -133,7 +133,7 @@ func Test_validate(t *testing.T) {
 							UseDefaultCAs: ptr.To(true),
 						},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -148,7 +148,7 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("test")},
 						{Secret: &trustapi.SourceObjectKeySelector{Name: "", KeySelector: trustapi.KeySelector{Key: ""}}},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -166,7 +166,7 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("test")},
 						{Secret: &trustapi.SourceObjectKeySelector{Name: "some-secret", Selector: &metav1.LabelSelector{}, KeySelector: trustapi.KeySelector{Key: "test"}}},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -182,7 +182,7 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("test")},
 						{ConfigMap: &trustapi.SourceObjectKeySelector{Name: "test-bundle", KeySelector: trustapi.KeySelector{Key: "test"}}},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -197,7 +197,7 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("test")},
 						{Secret: &trustapi.SourceObjectKeySelector{Name: "test-bundle", KeySelector: trustapi.KeySelector{Key: "test"}}},
 					},
-					Target: trustapi.BundleTarget{Secret: &trustapi.KeySelector{Key: "test"}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{Secret: &trustapi.KeySelector{Key: "test"}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -210,7 +210,7 @@ func Test_validate(t *testing.T) {
 					Sources: []trustapi.BundleSource{
 						{InLine: ptr.To("test")},
 					},
-					Target: trustapi.BundleTarget{ConfigMap: &trustapi.KeySelector{Key: ""}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{ConfigMap: &trustapi.KeySelector{Key: ""}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -223,7 +223,7 @@ func Test_validate(t *testing.T) {
 					Sources: []trustapi.BundleSource{
 						{InLine: ptr.To("test")},
 					},
-					Target: trustapi.BundleTarget{Secret: &trustapi.KeySelector{Key: ""}},
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{Secret: &trustapi.KeySelector{Key: ""}}},
 				},
 			},
 			expErr: ptr.To(field.ErrorList{
@@ -238,7 +238,9 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("test-1")},
 					},
 					Target: trustapi.BundleTarget{
-						ConfigMap: &trustapi.KeySelector{Key: "test-1"},
+						BundleTargetSpec: trustapi.BundleTargetSpec{
+							ConfigMap: &trustapi.KeySelector{Key: "test-1"},
+						},
 						NamespaceSelector: &trustapi.NamespaceSelector{
 							MatchLabels: map[string]string{"@@@@": ""},
 						},
@@ -265,15 +267,17 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("foo")},
 					},
 					Target: trustapi.BundleTarget{
-						AdditionalFormats: &trustapi.AdditionalFormats{
-							JKS: &trustapi.JKS{
-								KeySelector: trustapi.KeySelector{
-									Key: "bar",
+						BundleTargetSpec: trustapi.BundleTargetSpec{
+							AdditionalFormats: &trustapi.AdditionalFormats{
+								JKS: &trustapi.JKS{
+									KeySelector: trustapi.KeySelector{
+										Key: "bar",
+									},
 								},
 							},
-						},
-						ConfigMap: &trustapi.KeySelector{
-							Key: "bar",
+							ConfigMap: &trustapi.KeySelector{
+								Key: "bar",
+							},
 						},
 						NamespaceSelector: &trustapi.NamespaceSelector{
 							MatchLabels: map[string]string{"foo": "bar"},
@@ -291,15 +295,17 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("foo")},
 					},
 					Target: trustapi.BundleTarget{
-						AdditionalFormats: &trustapi.AdditionalFormats{
-							PKCS12: &trustapi.PKCS12{
-								KeySelector: trustapi.KeySelector{
-									Key: "bar",
+						BundleTargetSpec: trustapi.BundleTargetSpec{
+							AdditionalFormats: &trustapi.AdditionalFormats{
+								PKCS12: &trustapi.PKCS12{
+									KeySelector: trustapi.KeySelector{
+										Key: "bar",
+									},
 								},
 							},
-						},
-						ConfigMap: &trustapi.KeySelector{
-							Key: "bar",
+							ConfigMap: &trustapi.KeySelector{
+								Key: "bar",
+							},
 						},
 						NamespaceSelector: &trustapi.NamespaceSelector{
 							MatchLabels: map[string]string{"foo": "bar"},
@@ -317,7 +323,9 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("test-1")},
 					},
 					Target: trustapi.BundleTarget{
-						ConfigMap: &trustapi.KeySelector{Key: "test-1"},
+						BundleTargetSpec: trustapi.BundleTargetSpec{
+							ConfigMap: &trustapi.KeySelector{Key: "test-1"},
+						},
 						NamespaceSelector: &trustapi.NamespaceSelector{
 							MatchLabels: map[string]string{"foo": "bar"},
 						},
@@ -346,15 +354,17 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("foo")},
 					},
 					Target: trustapi.BundleTarget{
-						AdditionalFormats: &trustapi.AdditionalFormats{
-							JKS: &trustapi.JKS{
-								KeySelector: trustapi.KeySelector{
-									Key: "bar.jks",
+						BundleTargetSpec: trustapi.BundleTargetSpec{
+							AdditionalFormats: &trustapi.AdditionalFormats{
+								JKS: &trustapi.JKS{
+									KeySelector: trustapi.KeySelector{
+										Key: "bar.jks",
+									},
 								},
 							},
-						},
-						ConfigMap: &trustapi.KeySelector{
-							Key: "bar",
+							ConfigMap: &trustapi.KeySelector{
+								Key: "bar",
+							},
 						},
 						NamespaceSelector: &trustapi.NamespaceSelector{
 							MatchLabels: map[string]string{"foo": "bar"},
@@ -372,15 +382,17 @@ func Test_validate(t *testing.T) {
 						{InLine: ptr.To("foo")},
 					},
 					Target: trustapi.BundleTarget{
-						AdditionalFormats: &trustapi.AdditionalFormats{
-							PKCS12: &trustapi.PKCS12{
-								KeySelector: trustapi.KeySelector{
-									Key: "bar.p12",
+						BundleTargetSpec: trustapi.BundleTargetSpec{
+							AdditionalFormats: &trustapi.AdditionalFormats{
+								PKCS12: &trustapi.PKCS12{
+									KeySelector: trustapi.KeySelector{
+										Key: "bar.p12",
+									},
 								},
 							},
-						},
-						ConfigMap: &trustapi.KeySelector{
-							Key: "bar",
+							ConfigMap: &trustapi.KeySelector{
+								Key: "bar",
+							},
 						},
 						NamespaceSelector: &trustapi.NamespaceSelector{
 							MatchLabels: map[string]string{"foo": "bar"},
@@ -419,11 +431,11 @@ func Test_validate_update(t *testing.T) {
 			oldBundle: &trustapi.Bundle{
 				ObjectMeta: metav1.ObjectMeta{Name: "testing"},
 				Spec: trustapi.BundleSpec{
-					Target: trustapi.BundleTarget{
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{
 						ConfigMap: &trustapi.KeySelector{
 							Key: "bar",
 						},
-					},
+					}},
 				},
 			},
 			newBundle: &trustapi.Bundle{},
@@ -433,11 +445,11 @@ func Test_validate_update(t *testing.T) {
 			oldBundle: &trustapi.Bundle{
 				ObjectMeta: metav1.ObjectMeta{Name: "testing"},
 				Spec: trustapi.BundleSpec{
-					Target: trustapi.BundleTarget{
+					Target: trustapi.BundleTarget{BundleTargetSpec: trustapi.BundleTargetSpec{
 						Secret: &trustapi.KeySelector{
 							Key: "bar",
 						},
-					},
+					}},
 				},
 			},
 			newBundle: &trustapi.Bundle{},
