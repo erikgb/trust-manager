@@ -1311,15 +1311,20 @@ func Test_Reconcile(t *testing.T) {
 			)
 
 			log, ctx := ktesting.NewTestContext(t)
+			opts := Options{
+				Log:                  log,
+				Namespace:            trustNamespace,
+				SecretTargetsEnabled: !test.disableSecretTargets,
+				FilterExpiredCerts:   true,
+			}
 			b := &bundle{
 				client:   fakeClient,
 				recorder: fakeRecorder,
 				clock:    fixedclock,
-				Options: Options{
-					Log:                  log,
-					Namespace:            trustNamespace,
-					SecretTargetsEnabled: !test.disableSecretTargets,
-					FilterExpiredCerts:   true,
+				Options:  opts,
+				sourceDataBuilder: &bundleDataBuilder{
+					client:  fakeClient,
+					Options: opts,
 				},
 				targetReconciler: &target.Reconciler{
 					Client: fakeClient,
@@ -1335,7 +1340,7 @@ func Test_Reconcile(t *testing.T) {
 			}
 
 			if test.configureDefaultPackage {
-				b.defaultPackage = testDefaultPackage.Clone()
+				b.sourceDataBuilder.defaultPackage = testDefaultPackage.Clone()
 			}
 			resp, result, err := b.reconcileBundle(ctx, ctrl.Request{NamespacedName: types.NamespacedName{Name: bundleName}})
 			if (err != nil) != test.expError {

@@ -38,7 +38,6 @@ import (
 	trustapi "github.com/cert-manager/trust-manager/pkg/apis/trust/v1alpha1"
 	"github.com/cert-manager/trust-manager/pkg/bundle/internal/ssa_client"
 	"github.com/cert-manager/trust-manager/pkg/bundle/internal/target"
-	"github.com/cert-manager/trust-manager/pkg/fspkg"
 )
 
 // Options hold options for the Bundle controller.
@@ -68,10 +67,6 @@ type bundle struct {
 	// a cache-backed Kubernetes client
 	client client.Client
 
-	// defaultPackage holds the loaded 'default' certificate package, if one was specified
-	// at startup.
-	defaultPackage *fspkg.Package
-
 	// recorder is used for create Kubernetes Events for reconciled Bundles.
 	recorder record.EventRecorder
 
@@ -80,6 +75,8 @@ type bundle struct {
 
 	// Options holds options for the Bundle controller.
 	Options
+
+	sourceDataBuilder *bundleDataBuilder
 
 	targetReconciler *target.Reconciler
 }
@@ -135,7 +132,7 @@ func (b *bundle) reconcileBundle(ctx context.Context, req ctrl.Request) (result 
 	statusPatch = &trustapi.BundleStatus{
 		DefaultCAPackageVersion: bundle.Status.DefaultCAPackageVersion,
 	}
-	resolvedBundle, err := b.buildSourceBundle(ctx, bundle.Spec.Sources, bundle.Spec.Target.AdditionalFormats)
+	resolvedBundle, err := b.sourceDataBuilder.buildSourceBundle(ctx, bundle.Spec.Sources, bundle.Spec.Target.AdditionalFormats)
 
 	// If any source is not found, update the Bundle status to an unready state.
 	if errors.As(err, &notFoundError{}) {

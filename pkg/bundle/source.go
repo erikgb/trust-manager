@@ -29,6 +29,7 @@ import (
 
 	trustapi "github.com/cert-manager/trust-manager/pkg/apis/trust/v1alpha1"
 	"github.com/cert-manager/trust-manager/pkg/bundle/internal/target"
+	"github.com/cert-manager/trust-manager/pkg/fspkg"
 	"github.com/cert-manager/trust-manager/pkg/util"
 )
 
@@ -45,10 +46,22 @@ type bundleData struct {
 	defaultCAPackageStringID string
 }
 
+type bundleDataBuilder struct {
+	// a cache-backed Kubernetes client
+	client client.Client
+
+	// defaultPackage holds the loaded 'default' certificate package, if one was specified
+	// at startup.
+	defaultPackage *fspkg.Package
+
+	// Options holds options for the Bundle controller.
+	Options
+}
+
 // buildSourceBundle retrieves and concatenates all source bundle data for this Bundle object.
 // Each source data is validated and pruned to ensure that all certificates within are valid, and
 // is each bundle is concatenated together with a new line character.
-func (b *bundle) buildSourceBundle(ctx context.Context, sources []trustapi.BundleSource, formats *trustapi.AdditionalFormats) (bundleData, error) {
+func (b *bundleDataBuilder) buildSourceBundle(ctx context.Context, sources []trustapi.BundleSource, formats *trustapi.AdditionalFormats) (bundleData, error) {
 	var resolvedBundle bundleData
 	certPool := util.NewCertPool(util.WithFilteredExpiredCerts(b.FilterExpiredCerts))
 
@@ -109,7 +122,7 @@ func (b *bundle) buildSourceBundle(ctx context.Context, sources []trustapi.Bundl
 }
 
 // configMapBundle returns the data in the source ConfigMap within the trust Namespace.
-func (b *bundle) configMapBundle(ctx context.Context, ref *trustapi.SourceObjectKeySelector) (string, error) {
+func (b *bundleDataBuilder) configMapBundle(ctx context.Context, ref *trustapi.SourceObjectKeySelector) (string, error) {
 	// this slice will contain a single ConfigMap if we fetch by name
 	// or potentially multiple ConfigMaps if we fetch by label selector
 	var configMaps []corev1.ConfigMap
@@ -156,7 +169,7 @@ func (b *bundle) configMapBundle(ctx context.Context, ref *trustapi.SourceObject
 }
 
 // secretBundle returns the data in the source Secret within the trust Namespace.
-func (b *bundle) secretBundle(ctx context.Context, ref *trustapi.SourceObjectKeySelector) (string, error) {
+func (b *bundleDataBuilder) secretBundle(ctx context.Context, ref *trustapi.SourceObjectKeySelector) (string, error) {
 	// this slice will contain a single Secret if we fetch by name
 	// or potentially multiple Secrets if we fetch by label selector
 	var secrets []corev1.Secret

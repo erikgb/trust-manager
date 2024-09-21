@@ -57,6 +57,10 @@ func AddBundleController(
 		recorder: mgr.GetEventRecorderFor("bundles"),
 		clock:    clock.RealClock{},
 		Options:  opts,
+		sourceDataBuilder: &bundleDataBuilder{
+			client:  mgr.GetClient(),
+			Options: opts,
+		},
 		targetReconciler: &target.Reconciler{
 			Client: mgr.GetClient(),
 			Cache:  targetCache,
@@ -69,7 +73,7 @@ func AddBundleController(
 			return fmt.Errorf("must load default package successfully when default package location is set: %w", err)
 		}
 
-		b.defaultPackage = &pkg
+		b.sourceDataBuilder.defaultPackage = &pkg
 
 		b.Options.Log.Info("successfully loaded default package from filesystem", "path", b.Options.DefaultPackageLocation)
 	}

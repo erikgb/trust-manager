@@ -339,7 +339,7 @@ func Test_buildSourceBundle(t *testing.T) {
 				WithScheme(trustapi.GlobalScheme).
 				Build()
 
-			b := &bundle{
+			b := &bundleDataBuilder{
 				client: fakeClient,
 				defaultPackage: &fspkg.Package{
 					Name:    "testpkg",
